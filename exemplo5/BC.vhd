@@ -7,7 +7,6 @@ GENERIC (N : integer := 4);
 PORT (Reset, clk, inicio : IN STD_LOGIC;
       Az, Bz : IN STD_LOGIC;
       pronto : OUT STD_LOGIC;
-		A, B: IN std_logic_vector(N-1 downto 0);
       cA, cMult, cP, cB, mA, mP, m1, m2, op: OUT STD_LOGIC );
 END bc;
 
@@ -28,13 +27,15 @@ begin
 	end process;
 
 -- Logica de começo de estado
-	process(clk, EA)
+	process(clk, inicio, EA, Az, Bz)
 		begin
 		
 		case EA is
 		
 		when S0 =>
-			if inicio = '1' then
+			if inicio = '0' then
+				PE <= S0; 
+			else
 				PE <= S1;
 			end if;
 			
@@ -42,10 +43,9 @@ begin
 			PE <= S2;
 			
 		when S2 =>
-			if A /= "0000" and B /= "0000" then
+			if (Az = '0' or Bz = '0') then
 				PE <= S3;
-			end if;
-			if A = "0000" or B = "0000" then
+			else
 				PE <= S5;
 			end if;
 		
@@ -61,45 +61,83 @@ begin
 	end process;
 
 -- Logica de saida
-	process(clk, EA)
+	process(EA)
 		begin
 		
 		case EA is
 		
 		when S0 =>
-			CA <= '0';
-			CP <= '0';
-			pronto <= '1';
-			
-		when S1 =>
-			pronto <= '0';
-			mA <= '1';
-			cA <= '1';
-			cB <= '1';
-			mP <= '1';
-			cP <= '1';
-			
-		when S2 =>
+			mP <= '0';
 			cP <= '0';
+			mA <= '0';
 			cA <= '0';
 			cB <= '0';
-		
-		when S3 =>
-			mP <= '0';
-			cP <= '1';
 			m1 <= '0';
 			m2 <= '0';
 			op <= '0';
+			cMult <= '0';
+			pronto <= '1';
 			
+		when S1 =>
+			mP <= '1';
+			cP <= '1';
+			mA <= '1';
+			cA <= '1';
+			cB <= '1';
+			m1 <= '0';
+			m2 <= '0';
+			op <= '0';
+			cMult <= '0';
+			pronto <= '0';
+			
+		when S2 =>
+			mP <= '0';
+			cP <= '0';
+			mA <= '0';
+			cA <= '0';
+			cB <= '0';
+			m1 <= '0';
+			m2 <= '0';
+			op <= '0';
+			cMult <= '0';
+			pronto <= '0';
+			
+		when S3 =>
+			mP <= '0';
+			cP <= '1';
+			mA <= '0';
+			cA <= '0';
+			cB <= '0';
+			m1 <= '0';
+			m2 <= '0';
+			op <= '0';
+			cMult <= '0';
+			pronto <= '0';
+		
 		when S4 =>
+			mP <= '0';
+			cP <= '0';
 			mA <= '0';
 			cA <= '1';
+			cB <= '0';
 			m1 <= '1';
 			m2 <= '1';
 			op <= '1';
-				
+			cMult <= '0';
+			pronto <= '0';
+			
 		when S5 =>
+			mP <= '0';
+			cP <= '0';
+			mA <= '0';
+			cA <= '0';
+			cB <= '0';
+			m1 <= '0';
+			m2 <= '0';
+			op <= '0';
 			cMult <= '1';
+			pronto <= '0';
+	
 		end case;
 	end process;
 	
